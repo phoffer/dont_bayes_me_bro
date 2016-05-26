@@ -58,7 +58,7 @@ module DontBayesMeBro
     def create_queue_file
       puts "Generating file"
       data = []
-      Dir['training/spam/**/*'].reject {|fn| File.directory?(fn) }.each do |file|
+      Dir['training/test/**/*'].reject {|fn| File.directory?(fn) }.each do |file|
         break if data.length >= @test_count / 2
         begin
           body = Mail.read(file).body.to_s
@@ -73,20 +73,6 @@ module DontBayesMeBro
         end
       end
 
-      Dir['training/ham/**/*'].reject {|fn| File.directory?(fn) }.each do |file|
-        break if data.length >= @test_count
-        begin
-          body = Mail.read(file).body.to_s
-          if body.length > 100
-            data << body
-            puts "PASSED: #{file} added"
-          else
-            puts "FAILED: #{file} not added due to small body"
-          end
-        rescue
-          puts "FAILED: #{file} not added due to exception"
-        end
-      end
       File.open("training/queue-#{@test_count}",'w'){|f| Marshal.dump(data, f)}
       nil
     end
